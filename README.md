@@ -1,36 +1,53 @@
 # Task A: Appointment Slot Recommender
 ## System Description
 
-You are asked to implement Python functions that can recommend available meeting slots given working hours, busy intervals, meeting duration, optional buffer time, and a candidate window. The function must return chronologically ordered suggestions that fit within working hours and do not overlap busy intervals under buffering rules. It must handle edge cases such as adjacent intervals, tiny gaps, and buffers eliminating availability.
+In this lab, you will design and implement an **Appointment Slot Recommender** using an LLM assistant as your primary programming collaborator. You are asked to implement a Python module that recommends available meeting slots within a defined working window. The system must:
 
-Inputs include: (i) a list of medications with frequencies and permissible time windows;
-(ii) user quiet hours during which notifications must not occur;
-(iii) a maximum notification rate (e.g., no more than 𝑘 reminders per hour);
-(iv) an optional snooze operation that shifts a reminder while preserving constraints. The scheduler outputs the next 𝑁 reminders in chronological order and must behave deterministically under ties. 
+·    Accept working hours (start and end time).
 
+·    Accept a list of existing busy intervals.
 
+·    Accept a required meeting duration.
 
-## Structure
+·    Accept an optional buffer time between meetings.
 
-- **med_scheduler.py** – starter file where you implement. Do not rename this file.
-- **test_med_scheduler.py** – Public tests you can run to check basic correctness. Use a test runner such as `pytest` to execute these tests.
+·    Optionally restrict suggestions to a candidate time window.
 
+·    Return chronologically ordered appointment slots that satisfy all constraints.
 
+The system must ensure that:
 
-## Running Tests
+·    Suggested slots fall within working hours.
 
-1. Install Python 3 if not already installed.
-2. Implement your solution in `med_scheduler.py`.
-3. Optionally create `test_med_scheduler.py` and write at least 5 test cases.
-4. Run tests using:
+·    Suggested slots do not overlap busy intervals.
 
-```
-pytest file_name.py
-```
+·    Buffer time is respected when evaluating availability.
 
-5. Fix any failing tests before moving on. Remember that hidden tests will check additional requirements
+·    Output ordering is deterministic under identical inputs.
 
- 
+The module must preserve the following invariants:
+
+·    Returned slots must be at least as long as the required duration.
+
+·    No returned slot may violate buffer constraints.
+
+·    The returned list must reflect the current system state.
+
+The system must correctly handle non-trivial scenarios such as:
+
+·    Adjacent busy intervals.
+
+·    Very small gaps between meetings.
+
+·    Buffers eliminating otherwise valid availability.
+
+·    Overlapping or unsorted busy intervals.
+
+·    A meeting duration longer than any available gap.
+
+·    No availability within the working window.
+
+The output consists of the next N valid appointment suggestions in chronological order.
 
 # How to Run Test Cases 
 
