@@ -2,19 +2,32 @@
 ## Student ID:
 
 """
-Task A: Medication Reminder Scheduler (Stub)
+Task A: Timeslot Recommender (Stub)
+In this lab, you will design and implement an Appointment Slot Recommender using an LLM assistant as your primary programming collaborator. You are asked to implement a Python module that recommends available meeting slots within a defined working window. The system must:
+•	Accept working hours (start and end time).
+•	Accept a list of existing busy intervals.
+•	Accept a required meeting duration.
+•	Accept an optional buffer time between meetings.
+•	Optionally restrict suggestions to a candidate time window.
+•	Return chronologically ordered appointment slots that satisfy all constraints.
+The system must ensure that:
+•	Suggested slots fall within working hours.
+•	Suggested slots do not overlap busy intervals.
+•	Buffer time is respected when evaluating availability.
+•	Output ordering is deterministic under identical inputs.
+The module must preserve the following invariants:
+•	Returned slots must be at least as long as the required duration.
+•	No returned slot may violate buffer constraints.
+•	The returned list must reflect the current system state.
+The system must correctly handle non-trivial scenarios such as:
+•	Adjacent busy intervals.
+•	Very small gaps between meetings.
+•	Buffers eliminating otherwise valid availability.
+•	Overlapping or unsorted busy intervals.
+•	A meeting duration longer than any available gap.
+•	No availability within the working window.
+The output consists of the next N valid appointment suggestions in chronological order.
 
-Implement a scheduler that generates medication reminders under user-defined constraints.
-
-Inputs include:
-  (i)  a list of medications with frequencies and permissible time windows,
-  (ii) user quiet hours during which notifications must not occur,
-  (iii) a maximum notification rate (no more than k reminders per hour),
-  (iv) an optional snooze operation that shifts a reminder while preserving constraints.
-
-The scheduler outputs the next N reminders in chronological order and must behave
-deterministically under ties.
-See the lab handout for full requirements.
 """
 
 from dataclasses import dataclass
