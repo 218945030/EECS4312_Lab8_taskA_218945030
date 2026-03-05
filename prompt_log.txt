@@ -1,6 +1,176 @@
-## Student Name:
-## Student ID: 
+## Student Name: Jonah Ottini
+## Student ID: 218945030
 
-Prompt #1: {}
-Response #1: {}
+Prompt #1: I need help designing a system with the following specifications: 
+Problem summery: The objective of the systems is to help teams find times to schedule their meetings within their specified work hours. 
+Functional Requirments: The system must accept the interval of working hours. 
+The system must accept a list of busy intervals where meetings cannot be scheduled. 
+The system must accept a duration of the meeting to be scheduled. 
+The system must accept a buffer time that must pass between two meetings. 
+The system must return a list of possible meeting times, that fall within the given constraints, in a chronological order.  
+Constraints: 
+1. Suggested meeting times must be within working hours 
+2. Suggested meeting times must not overlap with the defined busy intervals 
+3. Interval of working hours must be within a 24 hours period 
+4. Given busy intervals must be within the specified working hours 
+5. Suggested meeting times must be outputed in chronological order. 
+6. Time of buffer must pass after a meeting or busy interval before another meeting.  
+Acceptance Criteria: 
+AC1:
+Given a suggested meeting time 
+When it is within the specified working hours
+Then it is a valid input 
+Linked Constraint ID(s): C#1
+AC2:
+Given a suggested meeting time
+When it overlaps with a defined busy interval
+Then it is not a valid meeting time to suggest. 
+Linked Constraint ID(s): C#2
+AC3:
+Given The start and end times of the working hours interval 
+When the start time is greater than 0:00 and the end time is less than 24:00 
+Then the working hours interval is valid.
+Linked Constraint ID(s): C#3
+AC4:
+Given a busy interval
+When the iterval is within the specified working hours
+Then the busy interval is valid
+Linked Constraint ID(s): C#4
+AC5:
+Given a list suggested meeting times
+When the list is outputed
+Then the meeting times must be listed in chronological order. 
+Linked Constraint ID(s): C#5
+AC6:
+Given A suggested meeting time 
+When the suggested meeting time overlaps with specified buffer after another meeting or busy interval
+Then the suggested meeting time is not valid. 
+Linked Constraint ID(s): C#6
+
+Before generating any code, please let me know if there are any ambiguites or missing clarifications that you require. 
+
+Response #1: Good idea to clarify first. Your requirements are mostly clear, but there are several important ambiguities and edge cases that should be defined before designing the algorithm or writing code. I grouped them into categories so you can quickly decide the intended behavior.
+
+1. Time Representation 
+2. Interval Inclusivity 
+3. Buffer Time rules 
+4. Meeting Start Granularity 
+5. Busy Intervals Overlap 
+6. Sorting of busy intervals 
+7. Output Definition 
+8. Duration vs Working Hours Edge Case
+9. Busy Interval Validity (Constraint C#4)
+10. Multiple Team Members
+11. Maximum Meeting Suggestions
+12. Validation Errors
+13. Time Zone
+14. Overnight Working Hours
+--------------------------------------------------
+
+Prompt #2: Here are the clarifications you asked for 
+1. The system should be written in Python so I would like time to be represented with datetime objects (i.e. HH:MM)
+2. A buffer interval should be provided that specifies how much time must pass after a meeting or busy period, before a meeting can be scheduled \
+3. Buffer only appliess after busy periods and meetings 
+4. Any available start time within working hours is a valid start time. 
+5. Busy intervals should not overlap eachother. 
+6. Busy intervals will be inputed in sorted order. 
+7. The system will output a list of possible meeting intervals in corresponding order by time. 
+8. If meeting duration is longer than work hours an exception should be thrown. 
+9. Reject inputs for busy intervals that are outside of working hours. 
+10. The system will be used by only one person. 
+11. The system should return all possible meeting times. 
+12. Throw an error for invalid intervals. 
+13. Time zone will be EST. 
+14. Overnight working houts are not allowed. Meeting should be scheduled in a single 24 hour period. 
+
+Reponse #2: Great — your clarifications remove most of the ambiguity. The requirements are now mostly consistent, but there are a few final details worth confirming before implementing the algorithm. These are small but affect correctness.
+
+1. Interval Boundary Definition (Very Important)
+2. Buffer Application at End of Workday
+3. Suggested Meetings vs Each Other
+4. Meeting Duration Fit
+5. Input Validation for Busy Intervals
+6. Data Structure for Inputs
+7. Algorithmic Assumption
+--------------------------------------------------
+
+Prompt #3: Here are the clarificationss you asked for 
+1. Possible meeting times should be both start and end inclusive. 
+2. The buffer is only scheduling other meetings, it does not care about the end of the workday. 
+3. The buffer should only apply after busy intervals, not after suggested meetings. 
+4. Meetings cannot extend past working hours. 
+5. Inputs should be validated for busy intervals, Start must be less than end and zero-length intervals are not allowed. 
+6. The provided is a acceptable input structure. 
+7. O(n + k) is an ok time complexity. 
+
+Response #3: Great — with these clarifications the specification is now complete and implementable. Before writing the code, I'll briefly restate the final interpreted rules to ensure everything is consistent.
+
+'Restates final interpreted rules and generated this code'
+
+from datetime import datetime, timedelta
+
+def validate_inputs(working_hours, busy_intervals, meeting_duration):
+    start, end = working_hours
+
+    if start >= end:
+        raise ValueError("Working hour start must be before end")
+
+    if meeting_duration > (end - start):
+        raise ValueError("Meeting duration exceeds working hours")
+
+    for busy_start, busy_end in busy_intervals:
+
+        if busy_start >= busy_end:
+            raise ValueError("Busy interval start must be before end")
+
+        if busy_start < start or busy_end > end:
+            raise ValueError("Busy interval must lie within working hours")
+
+def find_meeting_times(
+    working_hours,
+    busy_intervals,
+    meeting_duration,
+    buffer_time
+):
+
+    validate_inputs(working_hours, busy_intervals, meeting_duration)
+
+    work_start, work_end = working_hours
+    results = []
+
+    current_start = work_start
+
+    for busy_start, busy_end in busy_intervals:
+
+        free_start = current_start
+        free_end = busy_start
+
+        results.extend(
+            generate_meetings(
+                free_start,
+                free_end,
+                meeting_duration
+            )
+        )
+        current_start = busy_end + buffer_time
+
+    results.extend(
+        generate_meetings(
+            current_start,
+            work_end,
+            meeting_duration
+        )
+    )
+    return results
+
+def generate_meetings(start, end, duration):
+
+    meetings = []
+    current = start
+
+    while current + duration <= end:
+        meetings.append((current, current + duration))
+        current += timedelta(minutes=1)
+
+    return meetings
 --------------------------------------------------
