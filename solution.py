@@ -98,31 +98,81 @@ def suggest_slots(
     buffer: timedelta = timedelta(0),
     candidate_window: Optional[TimeWindow] = None
 ) -> List[Slot]:
-    """
-    Suggest up to the next n valid appointment slots (start times) for the given day.
 
-    Args:
-        day: the calendar day for which to suggest slots.
-        working_hours: the allowed working window for meetings (start < end).
-        busy_intervals: list of busy time intervals (may be overlapping / unsorted).
-        duration: required meeting length (must be > 0).
-        n: maximum number of slot suggestions to return (n >= 0).
-        buffer: optional buffer time required between meetings (buffer >= 0).
-        candidate_window: optional extra restriction on suggestions (must lie within this window too).
+    # -------- Validation --------
 
-    Returns:
-        A list of Slot objects, sorted by start_time ascending, deterministic under identical inputs.
-        If no suitable time slots are available, return an empty list.
+    if working_hours.start >= working_hours.end:
+        raise ValueError("Working hours start must be before end")
 
-    Notes:
-        - Suggested slots must fall within working_hours (and candidate_window if provided).
-        - Suggested slots must not overlap busy_intervals, considering buffer time.
-        - You are free to choose internal representation; inputs use time-of-day.
-        - See lab handout for required slot granularity (e.g., 5-min/15-min steps), if any.
-    """
+    working_length = datetime.combine(day, working_hours.end) - datetime.combine(day, working_hours.start)
 
-    ##################################################################
-    # TODO: Implement as per lab handout requirements and constraints.
-    ##################################################################
-    
-    raise NotImplementedError("suggest_slots has not been implemented yet")
+    if duration > working_length:
+        raise ValueError("Meeting duration longer than working hours")
+
+    for b in busy_intervals:
+        if b.start >= b.end:
+            raise ValueError("Busy interval start must be before end")
+
+        if b.start < working_hours.start or b.end > working_hours.end:
+            raise ValueError("Busy interval outside working hours")
+
+    # Determine effective scheduling window
+    window_start = working_hours.start
+    window_end = working_hours.end
+
+    if candidate_window:
+        if candidate_window.start < working_hours.start or candidate_window.end > working_hours.end:
+            raise ValueError("Candidate window must lie within working hours")
+
+        window_start = max(window_start, candidate_window.start)
+        window_end = min(window_end, candidate_window.end)
+
+    slots: List[Slot] = []
+
+    # Convert starting pointer
+    current_dt = datetime.combine(day, window_start)
+    window_end_dt = datetime.combine(day, window_end)
+
+    # -------- Process busy intervals --------
+
+    for busy in busy_intervals:
+
+        busy_start_dt = datetime.combine(day, busy.start)
+        busy_end_dt = datetime.combine(day, busy.end)
+
+        # free gap before busy interval
+        gap_start = current_dt
+        gap_end = busy_start_dt
+
+        slots.extend(
+            _generate_slots(gap_start, gap_end, duration, window_end_dt, n - len(slots))
+        )
+
+        if len(slots) >= n:
+            return slots
+
+        # move pointer after busy + buffer
+        current_dt = busy_end_dt + buffer
+
+    # final gap after last busy interval
+    slots.extend(
+        _generate_slots(current_dt, window_end_dt, duration, window_end_dt, n - len(slots))
+    )
+
+    if not slots:
+        raise InfeasibleSchedule("No valid meeting slots available")
+
+    return slots
+
+
+def _generate_slots(start_dt, end_dt, duration, window_end_dt, remaining):
+
+    slots: List[Slot] = []
+    current = start_dt
+
+    while current + duration <= end_dt and remaining > 0:
+        slots.append(Slot(start_time=current.time()))
+        current += timedelta(minutes=1)
+        remaining -= 1
+
+    return slots
