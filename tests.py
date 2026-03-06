@@ -179,3 +179,69 @@ def test_a5_buffer_eliminates_small_gaps():
 #################################################################################
 # Add your own additional tests here to cover more cases and edge cases as needed.
 #################################################################################
+
+def test_meeting_in_work_hours ():
+    workStartTime = 9
+    workEndTime = 17
+    day = date(2026, 2, 24)
+    working = TimeWindow(time(workStartTime, 0), time(workEndTime, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = []
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    # Every slot must be within working hours.
+    assert int(out[0].start_time.hour) >= workStartTime & int(out[0].start_time.hour) <= workEndTime
+
+def test_meeting_in_free_interval():
+    busyStart = 10
+    busyEnd = 12
+    day = date(2026, 2, 24)
+    working = TimeWindow(time(9, 0), time(17, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = [BusyInterval(time(busyStart, 0), time(busyEnd, 0))]
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    # Slots must not overlap with busy intervals
+    assert int(out[0].start_time.hour) >= busyEnd
+
+def test_valid_working_hours():
+    day = date(2026, 2, 24)
+    working = TimeWindow(time(9, 0), time(17, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = []
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    # Working hours must be between 0:00 and 24:00
+    assert int(working.start.hour) >= 0 & int(working.end.hour) <= 24
+
+def test_valid_busy_interval():
+    workStartTime = 9
+    workEndTime = 17
+    day = date(2026, 2, 24)
+    working = TimeWindow(time(workStartTime, 0), time(workEndTime, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = [BusyInterval(time(10, 0), time(12, 0))]
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    # Busy intervals must be in working hours
+    assert int(busy[0].start.hour) >= workStartTime & int(busy[0].end.hour) <= workEndTime
+
+def test_meeting_order():
+    day = date(2026, 2, 24)
+    working = TimeWindow(time(9, 0), time(17, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = []
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    # Second suggested slot must be after the first
+    assert int(out[0].start_time.hour) <= int(out[1].start_time.hour)
