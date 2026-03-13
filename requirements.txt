@@ -1,0 +1,46 @@
+## 1. Problem Understanding - Describe the problem your system solves.
+System purpose:
+Inputs to the system:
+Outputs produced by the system:
+Primary goal of the system:
+---
+## 2. Assumptions - List assumptions about the environment, users, or
+inputs.
+A1:
+… (fill at least 6 items)
+A6:
+---
+## 3. Functional Requirements - Describe the main behaviors the system
+must perform.
+FR1:
+... (fill at least 4 items)
+FR4:
+---
+## 4. System Constraints - Constraints are conditions the system must
+always respect. Each constraint should reference the persona attribute
+it originates from.
+C1:
+Derived from persona attribute:
+… (fill at least 6 items)
+C6:
+Derived from persona attribute:
+---
+## 5. Acceptance Criteria - Acceptance criteria define how system
+behavior will be verified.
+AC1:
+… (fill at least 6 items)
+AC6:
+---
+## 6. Edge Cases - Describe unusual or boundary situations the system
+must handle.
+EC1:
+Expected system behavior:
+… (fill at least 3 items)
+EC3:
+Expected system behavior:
+---
+## 7. Traceability - Link functional requirements to constraints and
+acceptance criteria. FR → C → AC mapping
+FR1 → 
+… (fill at least 6 items)
+FR6 →
