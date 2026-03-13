@@ -1,46 +1,173 @@
 ## 1. Problem Understanding - Describe the problem your system solves.
-System purpose:
-Inputs to the system:
-Outputs produced by the system:
-Primary goal of the system:
+System purpose: Automated meeting scheduling system
+Inputs to the system: Working Hours, Busy Intervals, Duration, Buffer
+Outputs produced by the system: Meeting Times
+Primary goal of the system: The objective of the systems is to help teams find times to schedule their meetings within their specified work hours. 
 ---
 ## 2. Assumptions - List assumptions about the environment, users, or
 inputs.
-A1:
-… (fill at least 6 items)
-A6:
+A1: System will be used in a professional enviorment 
+A2: System users will be team leads 
+A3: System inputs will be intervals of time 
+A4: System will be automated 
+A5: Team leads will rely on system consitency 
+A6: System will be easy to use without training 
 ---
 ## 3. Functional Requirements - Describe the main behaviors the system
 must perform.
-FR1:
-... (fill at least 4 items)
-FR4:
+FR1: The system must accept the interval of working hours. 
+FR2: The system must accept a list of busy intervals where meetings cannot be scheduled. 
+FR3: The system must accept a duration of the meeting to be scheduled.  
+FR4: The system must accept a buffer time that must pass between two meetings. 
+FR5: The system must return a list of possible meeting times, that fall within the given constraints, in a chronological order.  
+FR6: The system must only require user interaction for inputs.
+FR7: The system must automatically handle conflicts 
+FR8: The system must provide clear explainations for scheduling decisions 
+FR9: The system must explicitly handle edge cases 
 ---
 ## 4. System Constraints - Constraints are conditions the system must
 always respect. Each constraint should reference the persona attribute
 it originates from.
-C1:
-Derived from persona attribute:
-… (fill at least 6 items)
-C6:
-Derived from persona attribute:
+C1
+Persona: Jane 
+Persona attribute: User expects system to handle conflicts automatically 
+Attribute type: Need
+Operationalization: Converted into contraint
+Derived Constraint: The system must handle any timing conflicts without any user input. 
+Current support level: fully supports the constraint
+C2
+Persona: Jane 
+Persona attribute: User trusts automated systems will work as intented
+Attribute type: Behavior
+Operationalization: Narrative only
+Current support level: fully supports the constraint
+C3
+Persona: Jane 
+Persona attribute: User prefers minimal interaction with the system 
+Attribute type: Behaviors
+Operationalization: Converted into contraint
+Derived Constraint: The system must not require any user interaction beyond the orignal inputs. 
+Current support level: fully supports the constraint
+C4
+Persona: Jane 
+Persona attribute: User does not like when systems behave inconsitently 
+Attribute type: Pain Point
+Operationalization: Narrative only
+Current support level: fully supported
+C5
+Persona: Mo  
+Persona attribute: User will frequently update system. 
+Attribute type: Behavior
+Operationalization: Narrative only
+Current support level: partially supports constraint
+C6
+Persona: Mo  
+Persona attribute: User requires clear explaination for the systems actions. 
+Attribute type: Need
+Operationalization: Converted into constraint 
+Derived Constraint: The system will provide justification for scheduled outputs 
+Current support level: does not support constraint 
+C7
+Persona: Mo  
+Persona attribute: User requires edge cases to be handled.  
+Attribute type: Need
+Operationalization: Converted into constraint 
+Derived Constraint: The system will automatically and explicitly handle edge cases.
+Current support level: partially supports constraint
+C8
+Persona: Mo  
+Persona attribute: User dislikes when the system does not explain silent failures
+Attribute type: Pain Point
+Operationalization: Narrative only
+Current support level: partially supports constraint
 ---
 ## 5. Acceptance Criteria - Acceptance criteria define how system
 behavior will be verified.
 AC1:
-… (fill at least 6 items)
+Given a suggested meeting time 
+When it is within the specified working hours
+Then it is a valid input 
+Linked Constraint ID(s): C#1
+AC2:
+Given a suggested meeting time
+When it overlaps with a defined busy interval
+Then it is not a valid meeting time to suggest. 
+Linked Constraint ID(s): C#1
+AC3:
+Given The start and end times of the working hours interval 
+When the start time is greater than 0:00 and the end time is less than 24:00 
+Then the working hours interval is valid.
+Linked Constraint ID(s): C#7
+AC4:
+Given a busy interval
+When the iterval is within the specified working hours
+Then the busy interval is valid
+Linked Constraint ID(s): C#1
+AC5:
+Given a list suggested meeting times
+When the list is outputed
+Then the meeting times must be listed in chronological order. 
+Linked Constraint ID(s): C#6
 AC6:
+Given A suggested meeting time 
+When the suggested meeting time overlaps with specified buffer after another meeting or busy interval
+Then the suggested meeting time is not valid. 
+Linked Constraint ID(s): C#1
+AC7:
+Given A interval of working hours, a list of busy intervals, and a buffer interval
+When all of the given inputs are valid
+Then the system will output all possible meeting times without any user input 
+Linked Constraint ID(s): C#3
 ---
 ## 6. Edge Cases - Describe unusual or boundary situations the system
 must handle.
 EC1:
-Expected system behavior:
-… (fill at least 3 items)
+Description: Meeting scheduled at the start of the work period 
+Linked Constraint ID(s): C#1
+Covered by Acceptance Criteria ID(s): AC#1
+Expected system behavior: First output will be a meeting starting at the first hour of the work period
+
+EC2:
+Description: Meeting scheduled at the end of the work period
+Linked Constraint ID(s): C#1
+Covered by Acceptance Criteria ID(s): AC#1
+Expected system behavior: Meeting will not be scheduled past the end of working hours
+
 EC3:
-Expected system behavior:
+Description: Busy interval at the start of the work period
+Linked Constraint ID(s): C#4
+Covered by Acceptance Criteria ID(s): AC#4
+Expected system behavior: Meeting will scheduled after the busy interval if possible 
+
+EC4:
+Description: Busy interval at the end of the work period
+Linked Constraint ID(s): C#4
+Covered by Acceptance Criteria ID(s): AC#4
+Expected system behavior: Meeting will be scheduled before the busy interval if possible 
+
+EC5: 
+Description: No free intervals to schedule a meeting 
+Linked Constraint ID(s): C#1
+Covered by Acceptance Criteria ID(s): AC#1, AC#2, AC#6
+Expected system behavior: No meetings will be scheduled 
+
+EC6:
+Description: Only free interval overlaps with buffer. 
+Linked Constraint ID(s): C#1
+Covered by Acceptance Criteria ID(s): AC#1, AC#2, AC#6
+Expected system behavior: No meetings will be scheduled due to buffer time
 ---
 ## 7. Traceability - Link functional requirements to constraints and
 acceptance criteria. FR → C → AC mapping
-FR1 → 
-… (fill at least 6 items)
-FR6 →
+FR1 → C3 → AC#7
+FR2 → C3 → AC#7
+FR3 → C3 → AC#7
+FR4 → C3 → AC#7
+FR5 → C2 → AC#7
+FR6 → C3 → AC#7
+FR7 → C1 → AC#1
+FR7 → C1 → AC#2
+FR7 → C1 → AC#4
+FR7 → C1 → AC#6
+FR8 → C6 → AC#5
+FR9 → C7 → AC#3
