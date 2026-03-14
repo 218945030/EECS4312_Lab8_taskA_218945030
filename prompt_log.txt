@@ -1,21 +1,107 @@
 ## Student Name: Jonah Ottini
 ## Student ID: 218945030
 
-Prompt #1: I need help designing a system with the following specifications: 
-Problem summery: The objective of the systems is to help teams find times to schedule their meetings within their specified work hours. 
-Functional Requirments: The system must accept the interval of working hours. 
-The system must accept a list of busy intervals where meetings cannot be scheduled. 
-The system must accept a duration of the meeting to be scheduled. 
-The system must accept a buffer time that must pass between two meetings. 
-The system must return a list of possible meeting times, that fall within the given constraints, in a chronological order.  
-Constraints: 
-1. Suggested meeting times must be within working hours 
-2. Suggested meeting times must not overlap with the defined busy intervals 
-3. Interval of working hours must be within a 24 hours period 
-4. Given busy intervals must be within the specified working hours 
-5. Suggested meeting times must be outputed in chronological order. 
-6. Time of buffer must pass after a meeting or busy interval before another meeting.  
-Acceptance Criteria: 
+Prompt #1: I need help designing a system to help schedule meetings. The system will have 4 inputs: 
+- a time interval of working hours
+- a list of time intervals in which meetings should not be scheduled
+- the duration that the scheduled meeting must be 
+- a buffer time, that is the time that must pass after a meeting or busy interval before another meeting can be scheduled. 
+
+The system will output a list of all possible meetings that can be scheduled. 
+
+I have two personas that serve as examples of potential users of the system, both with their own specific needs for the design. 
+
+PERSONA 1 - Jane Adams (Primary User)
+Context. Busy professional managing daily routines and commitments who relies on
+automation to reduce cognitive load. Jane uses digital tools for medication reminders
+and event registrations and expects them to work reliably without manual oversight.
+Behaviors.
+• Acts quickly and rarely revisits system suggestions.
+• Trusts the system to resolve conflicts and enforce rules automatically.
+• Prefers concise outputs and minimal interaction when making decisions.
+Needs.
+• Predictable and stable ordering of reminders or system decisions.
+• Automatic handling of conflicts (e.g., reminder collisions or waitlist promotion).
+• Limited notification or information overload.
+Pain Points.
+• Receiving too many notifications or duplicate system messages.
+• Systems behave inconsistently in similar situations.
+• Having to manually resolve conflicts or check system correctness.
+
+PERSONA 2 – Mo Rodriguez (Edge User)
+Context. User with accessibility needs & heightened sensitivity to uncertainty. Mo relies
+on explicit explanations and consistent behavior to build trust in automated systems.
+Behaviors.
+• Carefully reviews outputs and seeks explanations for system decisions.
+• Performs frequent updates (e.g., snoozing reminders or cancelling
+registrations).
+• Experiences stress when outcomes appear arbitrary or unexplained.
+Needs.
+• Deterministic system behavior under ties or conflicting conditions.
+• Clear explanations when reminders are moved, skipped, or when waitlist
+promotions occur.
+• Explicitly handle edge cases instead of silent failure.
+Pain Points.
+• Not understanding why the system changed or rejected an action.
+• Silent failures or dropped reminders/requests.
+• Inconsistent responses across repeated or boundary scenarios.
+
+There are 8 constraints that are derived from these personas 
+
+C1
+Persona: Jane 
+Persona attribute: User expects system to handle conflicts automatically 
+Attribute type: Need
+Operationalization: Converted into contraint
+Derived Constraint: The system must handle any timing conflicts without any user input. 
+
+C2
+Persona: Jane 
+Persona attribute: User trusts automated systems will work as intented
+Attribute type: Behavior
+Operationalization: Narrative only
+
+C3
+Persona: Jane 
+Persona attribute: User prefers minimal interaction with the system 
+Attribute type: Behaviors
+Operationalization: Converted into contraint
+Derived Constraint: The system must not require any user interaction beyond the orignal inputs. 
+
+C4
+Persona: Jane 
+Persona attribute: User does not like when systems behave inconsitently 
+Attribute type: Pain Point
+Operationalization: Narrative only
+
+C5
+Persona: Mo  
+Persona attribute: User will frequently update system. 
+Attribute type: Behavior
+Operationalization: Narrative only
+
+C6
+Persona: Mo  
+Persona attribute: User requires clear explaination for the systems actions. 
+Attribute type: Need
+Operationalization: Converted into constraint 
+Derived Constraint: The system will provide justification for scheduled outputs 
+
+C7
+Persona: Mo  
+Persona attribute: User requires edge cases to be handled.  
+Attribute type: Need
+Operationalization: Converted into constraint 
+Derived Constraint: The system will automatically and explicitly handle edge cases.
+
+C8
+Persona: Mo  
+Persona attribute: User dislikes when the system does not explain silent failures
+Attribute type: Pain Point
+Operationalization: Narrative only
+
+Finally there are 7 acceptance criteria based on the given constraints. 
+
 AC1:
 Given a suggested meeting time 
 When it is within the specified working hours
@@ -25,92 +111,108 @@ AC2:
 Given a suggested meeting time
 When it overlaps with a defined busy interval
 Then it is not a valid meeting time to suggest. 
-Linked Constraint ID(s): C#2
+Linked Constraint ID(s): C#1
 AC3:
 Given The start and end times of the working hours interval 
 When the start time is greater than 0:00 and the end time is less than 24:00 
 Then the working hours interval is valid.
-Linked Constraint ID(s): C#3
+Linked Constraint ID(s): C#7
 AC4:
 Given a busy interval
 When the iterval is within the specified working hours
 Then the busy interval is valid
-Linked Constraint ID(s): C#4
+Linked Constraint ID(s): C#1
 AC5:
 Given a list suggested meeting times
 When the list is outputed
 Then the meeting times must be listed in chronological order. 
-Linked Constraint ID(s): C#5
+Linked Constraint ID(s): C#6
 AC6:
 Given A suggested meeting time 
 When the suggested meeting time overlaps with specified buffer after another meeting or busy interval
 Then the suggested meeting time is not valid. 
-Linked Constraint ID(s): C#6
+Linked Constraint ID(s): C#1
+AC7:
+Given A interval of working hours, a list of busy intervals, and a buffer interval
+When all of the given inputs are valid
+Then the system will output all possible meeting times without any user input 
+Linked Constraint ID(s): C#3
 
 Before generating any code, please let me know if there are any ambiguites or missing clarifications that you require. 
 
-Response #1: Good idea to clarify first. Your requirements are mostly clear, but there are several important ambiguities and edge cases that should be defined before designing the algorithm or writing code. I grouped them into categories so you can quickly decide the intended behavior.
+Response #1: Your specification is already quite clear, but before implementing anything there are a few important ambiguities and edge-case decisions that should be clarified. These matter especially because of Mo’s constraints around determinism, explanations, and explicit edge-case handling (C6, C7).
 
-1. Time Representation 
-2. Interval Inclusivity 
-3. Buffer Time rules 
-4. Meeting Start Granularity 
-5. Busy Intervals Overlap 
-6. Sorting of busy intervals 
-7. Output Definition 
-8. Duration vs Working Hours Edge Case
-9. Busy Interval Validity (Constraint C#4)
-10. Multiple Team Members
-11. Maximum Meeting Suggestions
-12. Validation Errors
-13. Time Zone
-14. Overnight Working Hours
+Below are the key areas where clarification would help ensure the system behaves consistently.
+
+1. Time representation 
+2. Inclusivity of Time Intervals
+3. Buffer Application Rules
+4. Buffer Before vs After
+5. Busy Interval Validity Rules
+6. Ordering and Overlap of Busy Input
+7. What Counts as a “Possible Meeting”?
+8. Handling Invalid Inputs
+9. Output Format
+10. Explanation Requirements
+11. Handling Zero Results
+12. Maximum Output Size
+13. Time Zone Assumption
 --------------------------------------------------
 
 Prompt #2: Here are the clarifications you asked for 
-1. The system should be written in Python so I would like time to be represented with datetime objects (i.e. HH:MM)
-2. A buffer interval should be provided that specifies how much time must pass after a meeting or busy period, before a meeting can be scheduled \
-3. Buffer only appliess after busy periods and meetings 
-4. Any available start time within working hours is a valid start time. 
-5. Busy intervals should not overlap eachother. 
-6. Busy intervals will be inputed in sorted order. 
-7. The system will output a list of possible meeting intervals in corresponding order by time. 
-8. If meeting duration is longer than work hours an exception should be thrown. 
-9. Reject inputs for busy intervals that are outside of working hours. 
-10. The system will be used by only one person. 
-11. The system should return all possible meeting times. 
-12. Throw an error for invalid intervals. 
-13. Time zone will be EST. 
-14. Overnight working houts are not allowed. Meeting should be scheduled in a single 24 hour period. 
+1. 1. The system should be written in Python so I would like time to be represented with datetime objects (i.e. HH:MM), seconds do not need to be represented 
+2. Meetings are allowed to be scheduled to start at the same time as the end of a busy interval, and can end at the same time as working hours end 
+3. Buffer will apply after both busy periods and meetings 
+4. Buffer should only apply after a scheduled meeting or busy interval 
+5. If busy intervals overlap they should be merged automatically 
+6. Busy intervals should be sorted automatically to ensure minimal interaction 
+7. The system should output all possible slots that do not overlap. 
+8. If an invalid input is entered the system should reject the request and notify the user which input is invalid ans why 
+9. Output format should be the start and end time of a possible meeting along with an explaination 
+10. Both accepted meeting times and rejected candidate times should be explained 
+11. If no meetings are possible the system should output that there are no valid meeting times as well as an explaination 
+12. Maximum output size is acceptable 
+13. Time zone can be assumed as EST 
 
-Reponse #2: Great — your clarifications remove most of the ambiguity. The requirements are now mostly consistent, but there are a few final details worth confirming before implementing the algorithm. These are small but affect correctness.
+Response #2: Great — your clarifications resolve most ambiguities and make the system design much more deterministic, which aligns well with both personas. Before writing code, there are a few remaining technical clarifications and one potential contradiction worth resolving.
 
-1. Interval Boundary Definition (Very Important)
-2. Buffer Application at End of Workday
-3. Suggested Meetings vs Each Other
-4. Meeting Duration Fit
-5. Input Validation for Busy Intervals
-6. Data Structure for Inputs
-7. Algorithmic Assumption
+1. Contradiction: “All possible slots that do not overlap”
+2. Candidate Time Resolution
+3. Handling Buffers Between Candidate Meetings
+4. Explanation Granularity
+5. Busy Interval Expansion With Buffer
+6. Busy Intervals Outside Working Hours
+7. Explanation Output Structure
+8. Handling Extremely Large Rejection Lists
 --------------------------------------------------
 
-Prompt #3: Here are the clarificationss you asked for 
-1. Possible meeting times should be both start and end inclusive. 
-2. The buffer is only scheduling other meetings, it does not care about the end of the workday. 
-3. The buffer should only apply after busy intervals, not after suggested meetings. 
-4. Meetings cannot extend past working hours. 
-5. Inputs should be validated for busy intervals, Start must be less than end and zero-length intervals are not allowed. 
-6. The provided is a acceptable input structure. 
-7. O(n + k) is an ok time complexity. 
+Prompt #3: Here are the clarifications you asked for 
+1. Candidate meetings are allowed to overlap each other, as long as they don't overlap busy intervals or buffers
+2. 1-minute resolution is acceptable 
+3. Buffer should not apply to candidate meeting suggestions 
+4. A detailed reasoning would be best 
+5. Expanding busy intervals to include the buffer is a good idea
+6. A busy interval that extends past working hours is invalid and it should be rejected
+7. Ouput one combined list of valid and rejected candidates 
+8. Extremely Large Rejection Lists are acceptable 
 
-Response #3: Great — with these clarifications the specification is now complete and implementable. Before writing the code, I'll briefly restate the final interpreted rules to ensure everything is consistent.
+Before generating code I just want to double check that there are no missing constraints, ambiguous requirments, or unhandled edge cases based on the two provided personas
 
-'Restates final interpreted rules and generated some code'
+Response #3: Your specification is now very close to complete and implementable, and it aligns well with the needs of both personas. There are no major missing constraints, but there are 5 small areas where formalizing behavior will prevent ambiguity or inconsistent outputs.
+
+1. Deterministic Tie Handling (Important for Mo)
+2. Meeting Duration Edge Case
+3. Busy Interval Exactly Equal to Working Hours
+4. Handling Duplicate Busy Intervals
+5. Zero-Length Busy Intervals
+6. Chronological Explanation Consistency
+7. Traceability Check (Constraints → ACs)
 --------------------------------------------------
 
-Prompt #4: I actually have some predefined classes already. Can you generate the code using this as a baseline
-
-Response #4: Perfect — since you already have the data models and function signature, we’ll implement suggest_slots() to satisfy the rules you defined earlier while respecting your structures.
-
-'Implements Code using the given classes' 
---------------------------------------------------
+Prompt #4: Here are the clarifications you asked for
+1. Candidate meetings must be evaluated and output strictly in chronological order of start time
+2. Explicitly allow meeting duration ≤ working interval length.
+3. The system should produce an explicit explaination 
+4. Busy intervals that overlap or are identical must be merged.
+5. Busy intervals should not be zero-length, busy interval must have positive duration
+6. Only the first detected reason should be reported
