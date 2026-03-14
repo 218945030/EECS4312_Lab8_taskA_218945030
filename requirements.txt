@@ -118,6 +118,11 @@ Given A interval of working hours, a list of busy intervals, and a buffer interv
 When all of the given inputs are valid
 Then the system will output all possible meeting times without any user input 
 Linked Constraint ID(s): C#3
+AC8: 
+Given a candidate meeting time
+When the system evaluates the candidate
+Then the system will output a justification explaining why the time was accepted or rejected
+Linked Constraint ID(s): C#6
 ---
 ## 6. Edge Cases - Describe unusual or boundary situations the system
 must handle.
@@ -171,3 +176,10 @@ FR7 → C1 → AC#4
 FR7 → C1 → AC#6
 FR8 → C6 → AC#5
 FR9 → C7 → AC#3
+
+## 8. Revision Notes 
+Revision Note 1 
+
+Requirmenent Added: AC8 - Output justification
+Reason: During requirments review the LMM identified that C6 was not explicitly reflected in acceptance criteria. 
+Action: Added new acceptance crieria AC8. 
