@@ -179,3 +179,72 @@ def test_a5_buffer_eliminates_small_gaps():
 #################################################################################
 # Add your own additional tests here to cover more cases and edge cases as needed.
 #################################################################################
+
+#C1, AC2, AC8
+def test_conflict_handling(capsys):
+    day = date(2026, 3, 14)
+    working = TimeWindow(time(9, 0), time(17, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = [BusyInterval(time(9, 0), time(17, 0))]
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    capture = capsys.readouterr()
+
+    #Explaination when there are no available meeting times
+    assert capture.out == "No valid meeting times available after applying busy intervals and buffers."
+
+# C3, A7
+def test_automation():
+    day = date(2026, 3, 14)
+    working = TimeWindow(time(9, 0), time(17, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = [BusyInterval(time(9, 0), time(13, 0))]
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    #Ealiest start time is at the end of the busy interval
+    assert int(out[0].start_time.hour) == 13
+
+#C6 AC5, AC8
+def test_output_justification(capsys):
+    day = date(2026, 3, 14)
+    working = TimeWindow(time(9, 0), time(17, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = [BusyInterval(time(9, 0), time(13, 0))]
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    capture = capsys.readouterr()
+
+    #System outputs candidate meeting time along with justification
+    assert capture.out == "start: 13:00, end: 15:00, accepted: True, reason: Valid meeting slot within working hours and no conflicts."
+
+#C7 AC3
+def test_meeting_at_start():
+    day = date(2026, 3, 14)
+    working = TimeWindow(time(9, 0), time(17, 0))
+    candidate = TimeWindow(time(9, 0), time(11, 0))
+    busy = [BusyInterval(time(11, 0), time(17, 0))]
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    #Candidate meeting should be scheduled at the start of working hours
+    assert int(out[0].start_time.hour) == 9
+
+#7, AC3
+def test_valid_working_hours():
+    day = date(2026, 2, 24)
+    working = TimeWindow(time(9, 0), time(17, 0))
+    candidate = TimeWindow(time(13, 0), time(15, 0))
+    busy = []
+    duration = timedelta(minutes=30)
+
+    out = suggest_slots(day, working, busy, duration, n=5, buffer=timedelta(0), candidate_window=candidate)
+
+    # Working hours must be between 0:00 and 24:00
+    assert int(working.start.hour) >= 0 & int(working.end.hour) <= 24
